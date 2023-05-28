@@ -33,7 +33,7 @@ namespace input {
 
         for (auto& query : query_stop_to_distans) {
             if (query.find("m to ") != query.npos)
-                SetDistansFromRequest(move(query), catalogue);
+                ParseDistance(move(query), catalogue);
         }
 
         for (auto& query : query_bus) {
@@ -78,7 +78,7 @@ namespace input {
         return result;
     }
 
-    void SetDistansFromRequest(std::string_view request, TransportCatalogue& catalogue) {
+    void ParseDistance(std::string_view request, TransportCatalogue& catalogue) {
         auto sep = request.find_first_of(':');
         const Stop* from = catalogue.FindStop(RemoveSpaces(request.substr(0, sep)));
 

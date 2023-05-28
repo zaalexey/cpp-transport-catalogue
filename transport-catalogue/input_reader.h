@@ -11,6 +11,6 @@ namespace input {
 	void FillTransportCatalogue(std::istream& in, TransportCatalogue& catalogue);
 	Bus GetBusFromRequest(std::string_view request, TransportCatalogue& catalogue);
 	Stop GetStopFromRequest(std::string_view request);
-	void SetDistansFromRequest(std::string_view request, TransportCatalogue& catalogue);
+	void ParseDistance(std::string_view request, TransportCatalogue& catalogue);
 	std::string RemoveSpaces(std::string_view str);
 }
