@@ -1,10 +1,12 @@
 #pragma once
 
 #include "geo.h"
+#include "domain.h"
 
 #include <deque>
 #include <string>
 #include <unordered_map>
+#include <map>
 #include <vector>
 #include <stdexcept>
 #include <unordered_set>
@@ -12,24 +14,6 @@
 
 namespace transport {
     using namespace geo;
-
-    struct Stop {
-        std::string name;
-        Coordinates coordinates;
-    };
-
-    struct Bus {
-        std::string number;
-        std::vector<const Stop*> stops;
-        bool circular_route;
-    };
-
-    struct RouteInfo {
-        size_t stops_count;
-        size_t unique_stops_count;
-        double route_length;
-        double curvature;
-    };
 
     class TransportCatalogue {
     public:
@@ -44,11 +28,11 @@ namespace transport {
         void AddStop(const Stop& stop);
         const Bus* FindRoute(const std::string_view route_number) const;
         const Stop* FindStop(const std::string_view stop_name) const;
-        const RouteInfo RouteInformation(const std::string_view route_number) const;
-        const std::unordered_map<std::string_view, std::set<std::string_view>>& GetBusesOnStop() const;
         size_t UniqueStopsCount(const std::string_view route_number) const;
         void SetDistance(const Stop* from, const Stop* to, const double distance);
         double GetDistance(const Stop* from, const Stop* to) const;
+        const std::set<std::string_view>& FindBusesOnStop(std::string_view stop_name) const;
+        const std::map<std::string_view, const Bus*> GetSortedBuses() const;
 
     private:
         std::deque<Bus> buses_;

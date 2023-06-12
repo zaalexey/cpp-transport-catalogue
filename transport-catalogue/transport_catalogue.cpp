@@ -25,46 +25,6 @@ namespace transport {
         return stopname_to_stop_.count(stop_name) ? stopname_to_stop_.at(stop_name) : nullptr;
     }
 
-    const RouteInfo TransportCatalogue::RouteInformation(const std::string_view route_number) const {
-        RouteInfo route_info{};
-        const Bus* bus = FindRoute(route_number);
-
-        if (!bus) {
-            throw std::invalid_argument("bus not found");
-        }
-        if (bus->circular_route) {
-            route_info.stops_count = bus->stops.size();
-        }
-        else {
-            route_info.stops_count = bus->stops.size() * 2 - 1;
-        }
-
-        double route_length = 0.0;
-        double geographic_length = 0.0;
-        for (size_t i = 0; i < bus->stops.size() - 1; ++i) {
-            const auto from = bus->stops[i];
-            const auto to = bus->stops[i + 1];
-            if (bus->circular_route) {
-                route_length += GetDistance(from, to);
-                geographic_length += ComputeDistance(from->coordinates, to->coordinates);
-            }
-            else {
-                route_length += GetDistance(from, to) + GetDistance(to, from);;
-                geographic_length += ComputeDistance(from->coordinates, to->coordinates) * 2;
-            }
-        }
-
-        route_info.unique_stops_count = UniqueStopsCount(route_number);
-        route_info.route_length = route_length;
-        route_info.curvature = route_length / geographic_length;
-
-        return route_info;
-    }
-
-    const std::unordered_map<std::string_view, std::set<std::string_view>>& TransportCatalogue::GetBusesOnStop() const {
-        return stop_to_buses_;
-    }
-
     size_t TransportCatalogue::UniqueStopsCount(const std::string_view route_number) const {
         std::unordered_set<std::string_view> unique_stops;
         for (const auto& stop : busname_to_bus_.at(route_number)->stops) {
@@ -87,4 +47,17 @@ namespace transport {
         else
             return 0;
     }
+
+    const std::set<std::string_view>& TransportCatalogue::FindBusesOnStop(std::string_view stop_name) const {
+        return stop_to_buses_.at(stop_name);
+    }
+
+    const std::map<std::string_view, const Bus*> TransportCatalogue::GetSortedBuses() const {
+        std::map<std::string_view, const Bus*> result;
+        for (const auto& bus : busname_to_bus_) {
+            result.emplace(bus);
+        }
+        return result;
+    }
+
 } //namespace transport
