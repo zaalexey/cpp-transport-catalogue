@@ -16,7 +16,7 @@ int main() {
     json_doc.LoadTransportCatalogue(catalogue);
 
     const auto& stat_requests = json_doc.GetStatRequests();
-    const auto& render_settings = json_doc.GetRenderSettings().AsMap();
+    const auto& render_settings = json_doc.GetRenderSettings().AsDict();
     const auto& renderer = json_doc.LoadRenderSettings(render_settings);
 
     RequestHandler rh(catalogue, renderer);
