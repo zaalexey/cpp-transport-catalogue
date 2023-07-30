@@ -21,17 +21,18 @@ public:
     const Node& GetBaseRequests() const;
     const Node& GetStatRequests() const;
     const Node& GetRenderSettings() const;
+    const Node& GetRoutingSettings() const;
 
     void ProcessRequests(const Node& stat_requests, RequestHandler& rh) const;
 
     void LoadTransportCatalogue(TransportCatalogue& catalogue);
     MapRenderer LoadRenderSettings(const Dict& request_map) const;
-
+    transport::Router LoadRoutingSettings(const Node& settings) const;
 
     const Node PrintRouteInformation(const Dict& request, RequestHandler& rh) const;
     const Node PrintStopsInformation(const Dict& request, RequestHandler& rh) const;
     const Node PrintMapInformation(const Dict& request, RequestHandler& rh) const;
-
+    const Node PrintRoutingInformation(const Dict& request_map, RequestHandler& rh) const;
 
 private:
     json::Document input_;

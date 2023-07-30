@@ -6,6 +6,7 @@
 
 using namespace json;
 using namespace renderer;
+using namespace transport;
 
 
 int main() {
@@ -19,7 +20,10 @@ int main() {
     const auto& render_settings = json_doc.GetRenderSettings().AsDict();
     const auto& renderer = json_doc.LoadRenderSettings(render_settings);
 
-    RequestHandler rh(catalogue, renderer);
+    const auto& routing_settings = json_doc.LoadRoutingSettings(json_doc.GetRoutingSettings());
+    const transport::Router router = { routing_settings, catalogue };
+
+    RequestHandler rh(catalogue, renderer, router);
     json_doc.ProcessRequests(stat_requests, rh);
 
 

@@ -12,6 +12,7 @@
 #include <unordered_set>
 #include <set>
 
+
 namespace transport {
     using namespace geo;
 
@@ -33,6 +34,7 @@ namespace transport {
         double GetDistance(const Stop* from, const Stop* to) const;
         const std::set<std::string_view>& FindBusesOnStop(std::string_view stop_name) const;
         const std::map<std::string_view, const Bus*> GetSortedBuses() const;
+        const std::map<std::string_view, const Stop*> GetSortedStops() const;
 
     private:
         std::deque<Bus> buses_;

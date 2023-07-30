@@ -51,3 +51,15 @@ bool RequestHandler::IsStopName(const std::string_view stop_name) const {
 const std::set<std::string_view>& RequestHandler::GetBusesOnStop(std::string_view stop_name) const {
     return db_.FindBusesOnStop(stop_name);
 }
+
+const std::optional<graph::Router<double>::RouteInfo> RequestHandler::GetOptimalRoute(const std::string_view stop_from, const std::string_view stop_to) const {
+    return router_.FindRoute(stop_from, stop_to);
+}
+
+const graph::DirectedWeightedGraph<double>& RequestHandler::GetRouterGraph() const {
+    return router_.GetGraph();
+}
+
+const vector<RouteWeight>& RequestHandler::GetRouterWeight() const {
+    return router_.GetRouteWeight();
+}
