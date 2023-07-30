@@ -37,13 +37,13 @@ namespace transport {
                         route_weight_.push_back({ bus_info->number, j - i });
                         stops_graph.AddEdge({ stop_ids_.at(stop_from->name) + 1,
                                               stop_ids_.at(stop_to->name),
-                                              dist_sum / (bus_velocity_ * (100.0 / 6.0)) });
+                                              dist_sum / (bus_velocity_ * SPEED_MMIN) });
 
                         if (!bus_info->circular_route) {
                             route_weight_.push_back({ bus_info->number, j - i });
                             stops_graph.AddEdge({ stop_ids_.at(stop_to->name) + 1,
                                                   stop_ids_.at(stop_from->name),
-                                                  dist_sum_inverse / (bus_velocity_ * (100.0 / 6.0)) });
+                                                  dist_sum_inverse / (bus_velocity_ * SPEED_MMIN) });
                         }
                     }
                 }

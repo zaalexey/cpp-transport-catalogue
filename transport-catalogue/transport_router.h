@@ -12,6 +12,8 @@ struct RouteWeight {
 	size_t span_count = 0;
 };
 
+constexpr double SPEED_MMIN = 1000.0 / 60.0;
+
 namespace transport {
 
 	class Router {
