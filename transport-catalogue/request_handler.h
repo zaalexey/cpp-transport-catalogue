@@ -22,7 +22,6 @@ public:
         , router_(router)
     {}
 
-
     svg::Document RenderMap() const;
 
     const RouteInfo RouteInformation(const std::string_view route_number) const;
@@ -32,9 +31,6 @@ public:
 
     const std::optional<graph::Router<double>::RouteInfo> GetOptimalRoute(const std::string_view stop_from, const std::string_view stop_to) const;
     const graph::DirectedWeightedGraph<double>& GetRouterGraph() const;
-
-    const vector<RouteWeight>& GetRouterWeight() const;
- 
 
 private:
     const TransportCatalogue& db_;

@@ -102,6 +102,7 @@ namespace renderer {
 
     class MapRenderer {
     public:
+        MapRenderer() = default;
         MapRenderer(const RenderSettings& render_settings)
             : render_settings_(render_settings)
         {}
@@ -112,7 +113,8 @@ namespace renderer {
         std::vector<Text> GetStopsLabels(const std::map<std::string_view, const Stop*>& stops, const SphereProjector& sp) const;
 
         svg::Document RenderMap(const std::map<std::string_view, const Bus*>& buses) const;
-
+       const RenderSettings GetRenderSettings() const;
+        
     private:
         const RenderSettings render_settings_;
     };

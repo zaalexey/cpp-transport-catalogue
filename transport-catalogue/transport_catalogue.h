@@ -11,7 +11,7 @@
 #include <stdexcept>
 #include <unordered_set>
 #include <set>
-
+#include <iostream>
 
 namespace transport {
     using namespace geo;
@@ -35,6 +35,7 @@ namespace transport {
         const std::set<std::string_view>& FindBusesOnStop(std::string_view stop_name) const;
         const std::map<std::string_view, const Bus*> GetSortedBuses() const;
         const std::map<std::string_view, const Stop*> GetSortedStops() const;
+        const std::unordered_map<std::pair<const Stop*, const Stop*>, double, StopDistancesHasher> GetStopDistances() const;
 
     private:
         std::deque<Bus> buses_;

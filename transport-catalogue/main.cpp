@@ -1,30 +1,55 @@
-#include <cassert>
-#include <sstream>
+#include <fstream>
+#include <iostream>
+#include <string_view>
 
-#include "request_handler.h"
+#include "transport_catalogue.h"
 #include "json_reader.h"
+#include "serialization.h"
 
-using namespace json;
-using namespace renderer;
-using namespace transport;
+using namespace std::literals;
 
+void PrintUsage(std::ostream& stream = std::cerr) {
+    stream << "Usage: transport_catalogue [make_base|process_requests]\n"sv;
+}
 
-int main() {
+int main(int argc, char* argv[]) {
+    if (argc != 2) {
+        PrintUsage();
+        return 1;
+    }
 
-    TransportCatalogue catalogue;
-    JsonReader json_doc(std::cin);
+    const std::string_view mode(argv[1]);
 
-    json_doc.LoadTransportCatalogue(catalogue);
+    if (mode == "make_base"sv) {
+        JsonReader json_input(std::cin);
+        transport::TransportCatalogue catalogue;
+        json_input.LoadTransportCatalogue(catalogue);
 
-    const auto& stat_requests = json_doc.GetStatRequests();
-    const auto& render_settings = json_doc.GetRenderSettings().AsDict();
-    const auto& renderer = json_doc.LoadRenderSettings(render_settings);
+        const auto& routing_settings = json_input.LoadRoutingSettings(json_input.GetRoutingSettings());
+        const transport::Router router = { routing_settings, catalogue };
+        const auto& render_settings = json_input.GetRenderSettings();
+        const auto& renderer = json_input.LoadRenderSettings(render_settings.AsDict());
+        const auto& serialization_settings = json_input.GetSerializationSettings();
 
-    const auto& routing_settings = json_doc.LoadRoutingSettings(json_doc.GetRoutingSettings());
-    const transport::Router router = { routing_settings, catalogue };
+        std::ofstream fout(serialization_settings.AsDict().at("file"s).AsString(), std::ios::binary);
+        if (fout.is_open()) {
+            serialization::Serialize(catalogue, renderer, router, fout);
+        }
+    }
+    else if (mode == "process_requests"sv) {
+        JsonReader json_input(std::cin);
+        std::ifstream db_file(json_input.GetSerializationSettings().AsDict().at("file"s).AsString(), std::ios::binary);
+        if (db_file) {
+            auto [catalogue, renderer, router, graph, stop_ids] = serialization::Deserialize(db_file);
+            const auto& stat_requests = json_input.GetStatRequests();
+            router.SetGraph(graph, stop_ids);
+            RequestHandler rh = { catalogue, renderer, router };
 
-    RequestHandler rh(catalogue, renderer, router);
-    json_doc.ProcessRequests(stat_requests, rh);
-
-
+            json_input.ProcessRequests(stat_requests, rh);
+        }
+    }
+    else {
+        PrintUsage();
+        return 1;
+    }
 }

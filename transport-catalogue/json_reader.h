@@ -22,6 +22,7 @@ public:
     const Node& GetStatRequests() const;
     const Node& GetRenderSettings() const;
     const Node& GetRoutingSettings() const;
+    const Node& GetSerializationSettings() const;
 
     void ProcessRequests(const Node& stat_requests, RequestHandler& rh) const;
 

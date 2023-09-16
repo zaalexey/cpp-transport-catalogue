@@ -34,6 +34,12 @@ const Node& JsonReader::GetRoutingSettings() const {
     return input_.GetRoot().AsDict().at("routing_settings"s);
 }
 
+const Node& JsonReader::GetSerializationSettings() const {
+    if (!input_.GetRoot().AsDict().count("serialization_settings"s))
+        return nullptr_;
+    return input_.GetRoot().AsDict().at("serialization_settings"s);
+}
+
 void JsonReader::ProcessRequests(const Node& stat_requests, RequestHandler& rh) const {
     Array result;
     for (auto& stat_request : stat_requests.AsArray()) {
@@ -160,7 +166,6 @@ MapRenderer JsonReader::LoadRenderSettings(const Dict& request_map) const {
 }
 
 transport::Router JsonReader::LoadRoutingSettings(const json::Node& settings) const {
-    transport::Router routing_settings;
     return transport::Router{ settings.AsDict().at("bus_wait_time"s).AsInt(), settings.AsDict().at("bus_velocity"s).AsDouble() };
 }
 
@@ -258,12 +263,10 @@ const Node JsonReader::PrintRoutingInformation(const Dict& request_map, RequestH
         items.reserve(routing.value().edges.size());
         for (auto& edge_id : routing.value().edges) {
             const graph::Edge<double> edge = rh.GetRouterGraph().GetEdge(edge_id);
-            const auto& router_weight = rh.GetRouterWeight();
-            
-            if (router_weight[edge_id].span_count == 0) {
+            if (edge.quality == 0) {
                 items.emplace_back(json::Node(json::Builder{}
                     .StartDict()
-                    .Key("stop_name"s).Value(router_weight[edge_id].name)
+                    .Key("stop_name"s).Value(edge.name)
                     .Key("time"s).Value(edge.weight)
                     .Key("type"s).Value("Wait"s)
                     .EndDict()
@@ -274,8 +277,8 @@ const Node JsonReader::PrintRoutingInformation(const Dict& request_map, RequestH
             else {
                 items.emplace_back(json::Node(json::Builder{}
                     .StartDict()
-                    .Key("bus"s).Value(router_weight[edge_id].name)
-                    .Key("span_count"s).Value(static_cast<int>(router_weight[edge_id].span_count))
+                    .Key("bus"s).Value(edge.name)
+                    .Key("span_count"s).Value(static_cast<int>(edge.quality))
                     .Key("time"s).Value(edge.weight)
                     .Key("type"s).Value("Bus"s)
                     .EndDict()

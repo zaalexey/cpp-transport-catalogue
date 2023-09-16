@@ -11,8 +11,7 @@ namespace transport {
 
         for (const auto& [stop_name, stop_info] : stops) {
             stop_ids[stop_info->name] = vertex_id;
-            route_weight_.push_back({ stop_info->name, 0 });
-            stops_graph.AddEdge({ vertex_id, ++vertex_id, static_cast<double>(bus_wait_time_) });
+            stops_graph.AddEdge({ stop_info->name, 0, vertex_id, ++vertex_id, static_cast<double>(bus_wait_time_) });
             ++vertex_id;
         }
         stop_ids_ = move(stop_ids);
@@ -34,14 +33,16 @@ namespace transport {
                             dist_sum += catalogue.GetDistance(stops[k - 1], stops[k]);
                             dist_sum_inverse += catalogue.GetDistance(stops[k], stops[k - 1]);
                         }
-                        route_weight_.push_back({ bus_info->number, j - i });
-                        stops_graph.AddEdge({ stop_ids_.at(stop_from->name) + 1,
+                        stops_graph.AddEdge({ bus_info->number,
+                                              j - i,
+                                              stop_ids_.at(stop_from->name) + 1,
                                               stop_ids_.at(stop_to->name),
                                               dist_sum / (bus_velocity_ * SPEED_MMIN) });
 
                         if (!bus_info->circular_route) {
-                            route_weight_.push_back({ bus_info->number, j - i });
-                            stops_graph.AddEdge({ stop_ids_.at(stop_to->name) + 1,
+                            stops_graph.AddEdge({ bus_info->number,
+                                                  j - i,
+                                                  stop_ids_.at(stop_to->name) + 1,
                                                   stop_ids_.at(stop_from->name),
                                                   dist_sum_inverse / (bus_velocity_ * SPEED_MMIN) });
                         }
@@ -63,8 +64,25 @@ namespace transport {
         return graph_;
     }
 
-    const vector<RouteWeight>& Router::GetRouteWeight() const {
-        return route_weight_;
+    void Router::SetGraph(const graph::DirectedWeightedGraph<double> graph, const std::map<std::string, graph::VertexId> stop_ids) {
+        graph_ = graph;
+        stop_ids_ = stop_ids;
+        router_ = std::make_unique<graph::Router<double>>(graph_);
     }
 
+    const int Router::GetBusWaitTime() const {
+        return bus_wait_time_;
+    }
+
+    const double Router::GetBusVelocity() const {
+        return bus_velocity_;
+    }
+
+    const Router Router::GetRouterSettings() const {
+        return { bus_wait_time_, bus_velocity_ };
+    }
+
+    const std::map<std::string, graph::VertexId> Router::GetStopIds() const {
+        return stop_ids_;
+    }
 }

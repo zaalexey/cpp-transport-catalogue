@@ -59,7 +59,3 @@ const std::optional<graph::Router<double>::RouteInfo> RequestHandler::GetOptimal
 const graph::DirectedWeightedGraph<double>& RequestHandler::GetRouterGraph() const {
     return router_.GetGraph();
 }
-
-const vector<RouteWeight>& RequestHandler::GetRouterWeight() const {
-    return router_.GetRouteWeight();
-}

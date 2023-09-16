@@ -68,4 +68,8 @@ namespace transport {
         return result;
     }
 
+    const std::unordered_map<std::pair<const Stop*, const Stop*>, double, TransportCatalogue::StopDistancesHasher> TransportCatalogue::GetStopDistances() const {
+        return stop_distances_;
+    }
+
 } //namespace transport
